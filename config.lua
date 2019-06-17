@@ -28,4 +28,6 @@ cfg.gpu1 = '' -- Dirección de la GPU 1
 cfg.gpu2 = '' -- Dirección de la GPU 2
 cfg.gpu3 = '' -- Dirección de la GPU 3
 
+cfg.alarm = '' -- Dirección de la alarma (redstone I/O)
+
 return cfg

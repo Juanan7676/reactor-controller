@@ -5,6 +5,7 @@
 gr = require("gr")
 component = require("component")
 cfg = require("cfg")
+act = require("actuators")
 
 -- Inicializar GPUs
 gpu1 = component.proxy(cfg.gpu1)
@@ -31,98 +32,53 @@ gpu2.fill(1,1,w2,w2," ")
 TjMax = 1000
 pressMax = 12000
 
+scrammed = false
+
+function processTempSensor(alt,temp,n)
+	local perc = temp/TjMax
+	gr.text(gpu1,1,alt,6,"Temperatura "..n..": ")
+	if perc <= 0.5 then
+		gr.progressBar(gpu1,17,alt,4,math.floor(20*perc),20)
+		gr.text(gpu1,37,alt,4,temp.."ºC/"..TjMax.."ºC")
+	elseif perc <= 0.75 then
+		gr.progressBar(gpu1,17,alt,6,math.floor(20*perc),20)
+		gr.text(gpu1,37,alt,6,temp.."ºC/"..TjMax.."ºC")
+	elseif perc < 1 then
+		gr.progressBar(gpu1,17,alt,3,math.floor(20*perc),20)
+		gr.text(gpu1,37,alt,3,temp.."ºC/"..TjMax.."ºC")
+	else -- El reactor ha alcanzado TjMax, SCRAM
+		act.triggerSCRAM(component.proxy(cfg.reactor_cpu),component.proxy(cfg.alarm))
+		scrammed = true
+	end
+end
+
 -- Bucle principal
 while true do
 	
-	local temp = component.proxy(cfg.temp1).getTemperature()
-	local perc = temp/TjMax
-	local alt = 2
-	gr.text(gpu1,1,alt,6,"Temperatura 1: ")
-	if perc <= 0.5 then
-		gr.progressBar(gpu1,17,alt,4,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,4,temp.."ºC/"..TjMax.."ºC")
-	elseif perc <= 0.75 then
-		gr.progressBar(gpu1,17,alt,6,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,6,temp.."ºC/"..TjMax.."ºC")
-	else
-		gr.progressBar(gpu1,17,alt,3,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,3,temp.."ºC/"..TjMax.."ºC")
+	if scrammed then
+		gr.text(gpu1,20,20,3,"Reactor was SCRAMed! Check for reactor integrity!")
+		os.sleep(30)
+		act.disableAlarm(component.proxy(cfg.alarm))
+		break
 	end
+	
+	local temp = component.proxy(cfg.temp1).getTemperature()
+	processTempSensor(2,temp,1)
 	
 	local temp = component.proxy(cfg.temp2).getTemperature()
-	local perc = temp/TjMax
-	local alt = 3
-	gr.text(gpu1,1,alt,6,"Temperatura 2: ")
-	if perc <= 0.5 then
-		gr.progressBar(gpu1,17,alt,4,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,4,temp.."ºC/"..TjMax.."ºC")
-	elseif perc <= 0.75 then
-		gr.progressBar(gpu1,17,alt,6,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,6,temp.."ºC/"..TjMax.."ºC")
-	else
-		gr.progressBar(gpu1,17,alt,3,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,3,temp.."ºC/"..TjMax.."ºC")
-	end
+	processTempSensor(3,temp,2)
 	
 	local temp = component.proxy(cfg.temp3).getTemperature()
-	local perc = temp/TjMax
-	local alt = 4
-	gr.text(gpu1,1,alt,6,"Temperatura 3: ")
-	if perc <= 0.5 then
-		gr.progressBar(gpu1,17,alt,4,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,4,temp.."ºC/"..TjMax.."ºC")
-	elseif perc <= 0.75 then
-		gr.progressBar(gpu1,17,alt,6,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,6,temp.."ºC/"..TjMax.."ºC")
-	else
-		gr.progressBar(gpu1,17,alt,3,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,3,temp.."ºC/"..TjMax.."ºC")
-	end
+	processTempSensor(4,temp,3)
 	
 	local temp = component.proxy(cfg.temp4).getTemperature()
-	local perc = temp/TjMax
-	local alt = 5
-	gr.text(gpu1,1,alt,6,"Temperatura 4: ")
-	if perc <= 0.5 then
-		gr.progressBar(gpu1,17,alt,4,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,4,temp.."ºC/"..TjMax.."ºC")
-	elseif perc <= 0.75 then
-		gr.progressBar(gpu1,17,alt,6,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,6,temp.."ºC/"..TjMax.."ºC")
-	else
-		gr.progressBar(gpu1,17,alt,3,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,3,temp.."ºC/"..TjMax.."ºC")
-	end
+	processTempSensor(5,temp,4)
 	
 	local temp = component.proxy(cfg.temp5).getTemperature()
-	local perc = temp/TjMax
-	local alt = 6
-	gr.text(gpu1,1,alt,6,"Temperatura 5: ")
-	if perc <= 0.5 then
-		gr.progressBar(gpu1,17,alt,4,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,4,temp.."ºC/"..TjMax.."ºC")
-	elseif perc <= 0.75 then
-		gr.progressBar(gpu1,17,alt,6,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,6,temp.."ºC/"..TjMax.."ºC")
-	else
-		gr.progressBar(gpu1,17,alt,3,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,3,temp.."ºC/"..TjMax.."ºC")
-	end
+	processTempSensor(6,temp,5)
 	
 	local temp = component.proxy(cfg.temp6).getTemperature()
-	local perc = temp/TjMax
-	local alt = 7
-	gr.text(gpu1,1,alt,6,"Temperatura 6: ")
-	if perc <= 0.5 then
-		gr.progressBar(gpu1,17,alt,4,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,4,temp.."ºC/"..TjMax.."ºC")
-	elseif perc <= 0.75 then
-		gr.progressBar(gpu1,17,alt,6,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,6,temp.."ºC/"..TjMax.."ºC")
-	else
-		gr.progressBar(gpu1,17,alt,3,math.floor(20*perc),20)
-		gr.text(gpu1,37,alt,3,temp.."ºC/"..TjMax.."ºC")
-	end
+	processTempSensor(7,temp,6)
 	
 	local _,press = component.proxy(cfg.cool_ent).getPipe()
 	local perc = press/pressMax
@@ -142,7 +98,32 @@ while true do
 	local _,press = component.proxy(cfg.cool_sal).getPipe()
 	local perc = press/pressMax
 	local alt = 3
+	entOpen = false
+	salOpen = false
+	
 	gr.text(gpu1,50,alt,6,"Entrada refrigerante: ")
+	if perc <= 0.5 then -- La presion es muy baja, abrir válvula de entrada
+		act.openValve(component.proxy(cfg.in_cool))
+		entOpen = true
+	elseif entOpen then
+		act.closeValve(component.proxy(cfg.in_cool))
+		entOpen = false
+	end
+	
+	if perc >= 0.95 then -- La presion es muy alta, abrir válvula de salida
+		act.openValve(component.proxy(cfg.out_cool))
+		salOpen = true
+	elseif salOpen then
+		act.closeValve(component.proxy(cfg.out_cool))
+		salOpen = false
+	end
+	
+	if entOpen then 
+		gr.text(gpu1,110,alt,7,"IN-VALVE OPEN")
+	elseif salOpen then
+		gr.text(gpu1,110,alt,7,"OUT-VALVE OPEN")
+	end
+	
 	if perc <= 0.5 then
 		gr.progressBar(gpu1,72,alt,4,math.floor(20*perc),20)
 		gr.text(gpu1,82,alt,4,press.." kPa/"..pressMax.." kPa")
