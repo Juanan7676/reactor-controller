@@ -1,16 +1,20 @@
-function triggerSCRAM(reactor, alarm)
-	reactor.lowerControlRods()
+local a = {}
+
+function a.triggerSCRAM(reactor, alarm)
+	reactor.lowerRods()
 	alarm.setOutput(1,15)
 end
 
-function disableAlarm(alarm)
+function a.disableAlarm(alarm)
 	alarm.setOutput(1,0)
 end
 
-function openValve(valve)
+function a.openValve(valve)
 	valve.setOutput({15,15,15,15,15,15})
 end
 
-function closeValve(valve)
+function a.closeValve(valve)
 	valve.setOutput({0,0,0,0,0,0})
 end
+
+return a
